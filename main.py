@@ -88,3 +88,74 @@ async def captive_portal_catch_all(request: Request, path: str):
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# --- 4. THE CAPTIVE PORTAL FRONTEND ---
+@app.get("/", response_class=HTMLResponse)
+async def portal_home():
+    return """
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>Emergency Offline Node</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: sans-serif; background: #f3f4f6; padding: 20px; }
+                .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; }
+                h1 { color: #dc2626; font-size: 24px; margin-bottom: 10px; }
+                input { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
+                button { width: 100%; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+                #result { margin-top: 20px; padding: 10px; background: #f9fafb; border-left: 4px solid #2563eb; display: none; }
+                .source-list { font-size: 12px; color: #6b7280; margin-top: 10px; }
+                .metrics-display { font-size: 11px; color: #10b981; margin-top: 5px; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>Emergency Assistant</h1>
+                <p>Connected to local offline network. No internet required.</p>
+                <input type="text" id="question" placeholder="Ask a medical or survival question...">
+                <button onclick="askQuestion()">Search Local Database</button>
+                
+                <div id="result">
+                    <strong>Answer:</strong>
+                    <div class="metrics-display" id="metrics-text"></div>
+                    <p id="answer-text" style="margin-top: 5px;">Loading...</p>
+                    <div class="source-list" id="sources-text"></div>
+                </div>
+            </div>
+
+            <script>
+                async function askQuestion() {
+                    const q = document.getElementById("question").value;
+                    const resultDiv = document.getElementById("result");
+                    const answerText = document.getElementById("answer-text");
+                    const sourcesText = document.getElementById("sources-text");
+                    const metricsText = document.getElementById("metrics-text");
+                    
+                    if (!q) return;
+                    
+                    resultDiv.style.display = "block";
+                    answerText.innerText = "Searching offline database...";
+                    sourcesText.innerText = "";
+                    metricsText.innerText = "";
+                    
+                    try {
+                        const res = await fetch("/api/ask", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ question: q })
+                        });
+                        const data = await res.json();
+                        answerText.innerText = data.answer;
+                        metricsText.innerText = `⏱ Retrieval: ${data.retrieval_time}s | Generation: ${data.generation_time}s`;
+                        sourcesText.innerHTML = "<strong>Sources used:</strong><br>" + data.sources.join("<br>");
+                    } catch (e) {
+                        answerText.innerText = "Error connecting to local server.";
+                    }
+                }
+            </script>
+        </body>
+    </html>
+    """
+
+# --- 5. THE CAPTIVE PORTAL CATCH-ALL ROUTE ---
