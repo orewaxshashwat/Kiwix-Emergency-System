@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiwix Emergency Offline Hub</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/app.js" defer></script>
+</head>
+<body>
+    <header class="emergency-header">
+        <div class="status-badge">🟢 OFFLINE MODE ACTIVE</div>
+        <h1>Kiwix Emergency Assistant</h1>
+        <p>Local Knowledge & RAG Node (No Internet Required)</p>
+    </header>
+
+    <main class="container">
+        <!-- Quick Emergency Buttons -->
+        <section class="quick-chips">
+            <h3>Quick Emergency Guides</h3>
+            <div class="chip-grid">
+                <button class="chip" onclick="quickSearch('Severe bleeding first aid')">🩹 Severe Bleeding</button>
+                <button class="chip" onclick="quickSearch('Treating burns and scalds')">🔥 Burns & Scalds</button>
+                <button class="chip" onclick="quickSearch('Emergency water purification')">💧 Water Purification</button>
+                <button class="chip" onclick="quickSearch('Basic shelter construction')">⛺ Survival Shelter</button>
+            </div>
+        </section>
+
+        <!-- Search / Chat Bar -->
+        <section class="search-section">
+            <div class="input-group">
+                <input type="text" id="queryInput" placeholder="Type an emergency question (e.g., how to treat a fracture)..." onkeypress="handleKeyPress(event)">
+                <button id="sendBtn" onclick="submitQuery()">Ask RAG</button>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading hidden">Searching offline index & generating response...</div>
+
+        <!-- Response Display Card -->
+        <section id="responseCard" class="response-card hidden">
+            <h2>Guidance</h2>
+            <div id="answerText" class="answer-box"></div>
+            
+            <div class="sources-container">
+                <h4>Verified Offline Sources (ZIM):</h4>
+                <ul id="sourcesList"></ul>
+            </div>
+
+            <div class="medical-disclaimer">
+                ⚠️ <strong>Emergency Notice:</strong> This system uses local offline knowledge. For life-threatening emergencies, seek professional medical or rescue personnel immediately.
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
